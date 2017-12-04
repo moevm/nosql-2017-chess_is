@@ -15,6 +15,7 @@ file(GLOB SOURCES
     ./*.qrc
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
+
 qt5_add_resources(Images images.qrc)
 qt5_use_modules(ChessCMake Core Gui Widgets)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${QT_LIBRARIES} ${Images})
+target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${Images})
