@@ -54,27 +54,24 @@ BoardVision::BoardVision(QWidget *widget)
 }
 
 BoardVision::~BoardVision(){
-    //db->openDB();
-    //db->deleteTable(currTable);
-    //db->closeDB();
+    db->deleteTable(currTable);
 }
 
 void BoardVision::buttons(){
     QLabel *partLabel = new QLabel("Партии:",baseWidget);
     partLabel->setGeometry(930,570,80,20);
     listWgt = new QListWidget(baseWidget);
-    //db->openDB();
     listWgt->setGeometry(930,590,100,60);
-    //listWgt->addItems(db->tableList());
+    listWgt->addItems(db->deleteList());
     connect( listWgt, SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListClicked(QListWidgetItem*)));
-
-    /*currTable="Save_"+QString::number(QDate::currentDate().day())+'_'+QString::number(QDate::currentDate().month());
+    QDate* d=new QDate();
+    currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month());
     if(db->containsTable(currTable))
     {
         saveInd++;
-        currTable="Save_"+QString::number(QDate::currentDate().day())+'_'+QString::number(QDate::currentDate().month())+"_"+QString::number(saveInd);
-    }*/
-    //db->createTable(currTable);
+        currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month())+"_"+QString::number(saveInd);
+    }
+    db->createTable(currTable);
     //qDebug() << db->tableList();
 
     QPushButton *dButton= new QPushButton("Загрузить партию",baseWidget);
@@ -100,26 +97,21 @@ void BoardVision::buttons(){
    QPushButton *seButton= new QPushButton("Удалить партию",baseWidget);
    seButton->setGeometry(700,650,150,20);
    connect( seButton, SIGNAL(clicked()),this,SLOT(deletedMoves()));
-    //db->closeDB();
 }
 
 void BoardVision::savedMoves(){
-   //db->openDB();
     listWgt->addItem(currTable);
     saveInd++;
-    //currTable="Save_"+QString::number(QDate::currentDate().day())+'_'+QString::number(QDate::currentDate().month())+"_"+QString::number(saveInd);
-     //db->createTable(currTable);
-   //db->closeDB();
+    QDate* d=new QDate();
+    currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month())+"_"+QString::number(saveInd);
+     db->createTable(currTable);
 }
 
 void BoardVision::deletedMoves(){
     listWgt->clear();
-    //db->openDB();
-    //db->deleteTable(table);
-    //QStringList sl =db->tableList();
-    //sl.removeLast();
-    //listWgt->addItems(sl);
-    //db->closeDB();
+    db->deleteTable(table);
+
+    listWgt->addItems(db->deleteList());
 }
 
 void BoardVision::initBoard(){
@@ -174,34 +166,29 @@ void BoardVision::initBoard(){
 void BoardVision::clearBoard(){
     c->refreshGame();
     index=-1;
-    /*db->openDB();
     db->deleteTable(currTable);
     db->createTable(currTable);
-    db->closeDB();*/
 }
 
 void BoardVision::backMove(){
     if(index>-1){
-        //db->openDB();
-        QPoint* moves = new QPoint[2];
+        QVector<QPoint> moves ;
         index--;
-        //moves=db->readMove(table,index && table !="");
-        //movesTable->selectRow(index);
-        //db->closeDB();
+        moves=db->readMove(table,index && table !="");
+        movesTable->selectRow(index);
         emit wantMove(moves[1],moves[0]);
     }
 }
 
 void BoardVision::nextMove(){
-    /*db->openDB();
     if(index<db->recordCount(table) && table !=""){
-        QPoint* moves = new QPoint[2];
+        QVector<QPoint> moves ;
     index++;
     moves=db->readMove(table,index);
     movesTable->selectRow(index);
+    db->writeMove(currTable,moves[0],moves[1]);
     emit wantMove(moves[0],moves[1]);
     }
-    db->closeDB();*/
 }
 void BoardVision::setupedMove(QList<Player*> pl,unsigned int play, bool k){
 
@@ -209,6 +196,7 @@ void BoardVision::setupedMove(QList<Player*> pl,unsigned int play, bool k){
     font.setPointSize(14);
     kLabel->setFont(font);
     kLabel->show();
+    qDebug() << k;
     if(k)
        kLabel->setText("Шах!");
     else
@@ -252,9 +240,7 @@ void BoardVision::tileClicked(QPoint p)
             {
                 tile[p.y()-1][p.x()-1]->checked=true;
                 tile[p.y()-1][p.x()-1]->tileDisplay();
-                //db->openDB();
-                //db->writeMove(currTable,fromto[0],p);
-                //db->closeDB();
+                db->writeMove(currTable,fromto[0],p);
                 emit wantMove(fromto[0],p);
                 tile[p.y()-1][p.x()-1]->checked=false;
                 tile[p.y()-1][p.x()-1]->tileDisplay();
@@ -268,25 +254,23 @@ void BoardVision::tileClicked(QPoint p)
 
 void BoardVision::moveList()
 {
-    //db->openDB();
     //QLabel *moves = new QLabel(baseWidget);
-    /*movesTable = new QTableWidget(db->recordCount(table),2,baseWidget);
+    movesTable = new QTableWidget(db->recordCount(table),2,baseWidget);
     movesTable->setGeometry(660,35,250,550);
     movesTable->setStyleSheet("QLabel {background-color: white;}");
-    movesTable->setHorizontalHeaderLabels(QStringList() << "Откуда" << "Куда");*/
+    movesTable->setHorizontalHeaderLabels(QStringList() << "Откуда" << "Куда");
     //QString t="";
     //t=table+'\n'+db->readMovesS(table)+'\n';
     //moves->setText(t);
-    QPoint* p = new QPoint[2];
+    QVector<QPoint> p ;
     for(int row=0; row!=movesTable->rowCount(); ++row){
-       // p=db->readMove(table,row);
-        //QTableWidgetItem *newItem = new QTableWidgetItem(db->intToChar(p[0].x())+QString::number(p[0].y()),QTableWidgetItem::Type);
-        //movesTable->setItem(row, 0, newItem);
-        //newItem = new QTableWidgetItem(db->intToChar(p[1].x())+QString::number(p[1].y()),QTableWidgetItem::Type);
-        //movesTable->setItem(row, 1, newItem);
+        p=db->readMove(table,row);
+        QTableWidgetItem *newItem = new QTableWidgetItem(db->intToChar(p[0].x())+QString::number(p[0].y()),QTableWidgetItem::Type);
+        movesTable->setItem(row, 0, newItem);
+        newItem = new QTableWidgetItem(db->intToChar(p[1].x())+QString::number(p[1].y()),QTableWidgetItem::Type);
+        movesTable->setItem(row, 1, newItem);
     }
    // moves->selectRow(0);
-    //db->closeDB();
     movesTable->show();
     //moves->selectRow(3);
 }

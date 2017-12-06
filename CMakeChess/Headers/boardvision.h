@@ -1,11 +1,12 @@
 #ifndef BOARDVISION_H
 #define BOARDVISION_H
 #include "tile.h"
-//#include "db.h"
+#include "db.h"
 #include <QListWidget>
 #include <QPushButton>
 #include <QTableWidget>
 #include <Headers/controller.h>
+#include <QDate>
 
 class BoardVision : public QObject
 {
@@ -19,7 +20,7 @@ class BoardVision : public QObject
     QListWidget *listWgt;
     QTableWidget *movesTable;
     Controller *c;
-    //DB *db = new DB();
+    DB *db = new DB();
     QLabel *kLabel;
     //unsigned int player;
 public:
