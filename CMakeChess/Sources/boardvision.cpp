@@ -61,8 +61,8 @@ void BoardVision::buttons(){
     QLabel *partLabel = new QLabel("Партии:",baseWidget);
     partLabel->setGeometry(930,570,80,20);
     listWgt = new QListWidget(baseWidget);
-    listWgt->setGeometry(930,590,100,60);
-    listWgt->addItems(db->deleteList());
+    listWgt->setGeometry(920,590,110,70);
+    listWgt->addItems(db->tableList("1"));
     connect( listWgt, SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListClicked(QListWidgetItem*)));
     QDate* d=new QDate();
     currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month());
@@ -72,7 +72,7 @@ void BoardVision::buttons(){
         currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month())+"_"+QString::number(saveInd);
     }
     db->createTable(currTable);
-    //qDebug() << db->tableList();
+    //qDebug() << db->tableList("1");
 
     QPushButton *dButton= new QPushButton("Загрузить партию",baseWidget);
     dButton->setGeometry(700,590,150,20);
@@ -104,14 +104,14 @@ void BoardVision::savedMoves(){
     saveInd++;
     QDate* d=new QDate();
     currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month())+"_"+QString::number(saveInd);
-     db->createTable(currTable);
+    db->createTable(currTable);
 }
 
 void BoardVision::deletedMoves(){
     listWgt->clear();
     db->deleteTable(table);
 
-    listWgt->addItems(db->deleteList());
+    listWgt->addItems(db->tableList(currTable));
 }
 
 void BoardVision::initBoard(){
@@ -263,8 +263,10 @@ void BoardVision::moveList()
     //t=table+'\n'+db->readMovesS(table)+'\n';
     //moves->setText(t);
     QVector<QPoint> p ;
+    qDebug() <<table << "for";
     for(int row=0; row!=movesTable->rowCount(); ++row){
         p=db->readMove(table,row);
+        qDebug() <<"moveList2";
         QTableWidgetItem *newItem = new QTableWidgetItem(db->intToChar(p[0].x())+QString::number(p[0].y()),QTableWidgetItem::Type);
         movesTable->setItem(row, 0, newItem);
         newItem = new QTableWidgetItem(db->intToChar(p[1].x())+QString::number(p[1].y()),QTableWidgetItem::Type);
@@ -275,6 +277,6 @@ void BoardVision::moveList()
     //moves->selectRow(3);
 }
 void BoardVision::onListClicked(QListWidgetItem *item){
-    //qDebug() <<item->text();
+    qDebug() <<item->text();
     table=item->text();
 }

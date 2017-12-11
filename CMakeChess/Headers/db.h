@@ -11,22 +11,25 @@
 #include <mongocxx/stdx.hpp>
 #include <mongocxx/uri.hpp>
 #include <QString>
+#include <QDebug>
+#include <string>
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
 using bsoncxx::builder::stream::document;
 using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::open_document;
+using namespace std;
 class DB
 {
 private:
-    mongocxx::database db;
+    mongocxx::instance instance{}; // This should be done only once.
+    mongocxx::client client{mongocxx::uri{}};
+    mongocxx::database db = client["chess"];
     mongocxx::collection collection;
 public:
     DB()
-    {   mongocxx::instance instance{}; // This should be done only once.
-        mongocxx::client client{mongocxx::uri{}};
-        db = client["chess"];
+    {
     }
     ~DB(){
 
@@ -69,45 +72,57 @@ public:
 
     void createTable(const QString &name)
     {
+
         collection = db[name.toStdString()];
+        qDebug() << name <<"cT";
     }
-    QStringList tableList()
+    QStringList tableList(const QString &ct)
     {
-        //qDebug() << db.tables();
+
         mongocxx::cursor curs= db.list_collections();
          QStringList list; QString s;
         for(auto coll : curs) {
           s=QString::fromStdString(bsoncxx::to_json(coll));
-          list<<s.split(",").first().split(":").last();
+          s=s.split(",").first().split(":").last().remove('"').remove(' ');
+          if(s!=ct)list<<s;
+
         }
+        qDebug() <<list;
         return list;
     }
     bool containsTable(const QString &name)
     {
-        return tableList().contains(name);
+        qDebug() <<"conT";
+        return tableList("1").contains(name);
     }
     QStringList deleteList(){
-     QStringList  sl=  tableList();
+     QStringList  sl=  tableList("1");
+     qDebug() <<"delL";
+     qDebug() << sl;
         foreach (QString s, sl) {
             if(recordCount(s)<=0)
                bool b=sl.removeOne(s);
         }
+
         return sl;
     }
 
     int recordCount(const QString &name)
     {
         createTable(name);
+        qDebug() <<"cou";
         mongocxx::cursor cursor = collection.find(document{} << finalize);
         int i=0;
         for(auto doc : cursor) {
           i++;
         }
+        qDebug() <<"i";
         return i;
     }
     void deleteTable(const QString &name)
     {
          createTable(name);
+         qDebug() <<"del "<<name;
          collection.drop();
     }
     void writeMove(const QString &table,QPoint from, QPoint to)
@@ -121,27 +136,35 @@ public:
           << "to2" << to.y()
           << finalize;
         bsoncxx::document::view view = doc_value.view();
+        qDebug() <<"wr1";
         bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
          collection.insert_one(view);
+        qDebug() <<"wr2";
     }
     QVector<QPoint> readMove(const QString &table, int i)
     {
         QStringList list; QString s;
 
         createTable(table);
+
         QVector<QPoint> moves;
         mongocxx::cursor cursor = collection.find(document{} << finalize);
+        qDebug() <<"rM";
+        int k=0;
         for(auto doc : cursor) {
             s= QString::fromStdString(bsoncxx::to_json(doc));
-            list<<s.split(",").first();
-            int k=0;
+
+            list=s.split(",");
+
+            qDebug() <<list[4].split(":")<<i;
             if(i==k)
             {
-                 moves[0]=QPoint(list[1].split(":").last().toInt(),list[2].split(":").last().toInt());
-                 moves[1]=QPoint(list[3].split(":").last().toInt(),list[4].split(":").last().toInt());
+                 moves<<QPoint(list[1].split(":").last().remove(" ").toInt(),list[2].split(":").last().remove(" ").toInt());
+                 moves<<QPoint(list[3].split(":").last().remove(" ").toInt(),list[4].split(":").last().remove(" ").remove("}").toInt());
             }
             k++;
         }
+        //qDebug() << moves;
         return moves;
     }
     QStringList readMovesS(const QString &name)
@@ -162,7 +185,7 @@ public:
     {
         if(deb.count()<6) return "false";
         QVector<QPoint> moves;
-        QStringList list=tableList();
+        QStringList list=tableList("1");
         int k=0,i;
         for(i =0;i<list.count();i++ )
         {
@@ -238,7 +261,6 @@ public:
 
     void Murphy(){
         //DB *db = new DB();
-            deleteTable("ChessMorphy");
             createTable("ChessMorphy");
             writeMove("ChessMorphy",QPoint(5,2),QPoint(5,4));
             writeMove("ChessMorphy",QPoint(5,7),QPoint(5,5));

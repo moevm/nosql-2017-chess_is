@@ -1,7 +1,7 @@
 #include <QApplication>
 #include "Headers/mainwindow.h"
 #include "Headers/board.h"
-//#include "db.h"
+#include "Headers/db.h"
 #include "Headers/boardvision.h"
 
 
@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
     QWidget *myWidget = new QWidget();
     myWidget->setGeometry(50,50,1070,700);
     //DB *db = new DB();
-    //db->openDB();
     //db->Murphy();
     //db->al23_barbo();
     BoardVision *bv = new BoardVision(myWidget);
@@ -20,7 +19,6 @@ int main(int argc, char *argv[])
     bv->buttons();
     myWidget->show();
     return a.exec();
-    //db->closeDB();
 }
 
 
