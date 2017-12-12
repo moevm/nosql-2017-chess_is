@@ -62,14 +62,13 @@ void BoardVision::buttons(){
     partLabel->setGeometry(930,570,80,20);
     listWgt = new QListWidget(baseWidget);
     listWgt->setGeometry(920,590,110,70);
-    listWgt->addItems(db->tableList("1"));
+    listWgt->addItems(db->tableList(currTable));
     connect( listWgt, SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListClicked(QListWidgetItem*)));
     QDate* d=new QDate();
     currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month());
     if(db->containsTable(currTable))
     {
-        saveInd++;
-        currTable="Save_"+QString::number(d->currentDate().day())+'_'+QString::number(d->currentDate().month())+"_"+QString::number(saveInd);
+        db->deleteTable(currTable);
     }
     db->createTable(currTable);
     //qDebug() << db->tableList("1");
@@ -97,7 +96,12 @@ void BoardVision::buttons(){
    QPushButton *seButton= new QPushButton("Удалить партию",baseWidget);
    seButton->setGeometry(700,650,150,20);
    connect( seButton, SIGNAL(clicked()),this,SLOT(deletedMoves()));
+   QPushButton *deButton= new QPushButton("Поиск по дебюту",baseWidget);
+   deButton->setGeometry(700,680,150,20);
+   connect( deButton, SIGNAL(clicked()),this,SLOT(findDeb()));
+   //connect( this, SIGNAL(closeEvent(QCloseEvent*)),this,SLOT(deletedCurrTable()));
 }
+
 
 void BoardVision::savedMoves(){
     listWgt->addItem(currTable);
@@ -114,6 +118,28 @@ void BoardVision::deletedMoves(){
     listWgt->addItems(db->tableList(currTable));
 }
 
+void BoardVision::deletedCurrTable(){
+    db->deleteTable(currTable);
+
+}
+
+void BoardVision::findDeb(){
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Поиск завершен");
+    int n=db->recordCount(currTable);
+        QVector<QPoint> moves;
+    for(int i=0;i<n;i++)
+        moves<<db->readMove(currTable,i);
+    qDebug() <<currTable<<moves;
+    QString t=db->searchDebute(moves,currTable);
+    if(t!="false"){
+        qDebug() <<t;
+        table=t;
+        moveList();
+        msgBox.setText(t);
+    } else msgBox.setText("Неудачно");
+    msgBox.exec();
+}
 void BoardVision::initBoard(){
     for(int i=7;i>=0;i--)
     {
@@ -254,7 +280,7 @@ void BoardVision::tileClicked(QPoint p)
 
 void BoardVision::moveList()
 {
-    //QLabel *moves = new QLabel(baseWidget);
+    if (table =="") return;
     movesTable = new QTableWidget(db->recordCount(table),2,baseWidget);
     movesTable->setGeometry(660,35,250,550);
     movesTable->setStyleSheet("QLabel {background-color: white;}");
@@ -263,10 +289,8 @@ void BoardVision::moveList()
     //t=table+'\n'+db->readMovesS(table)+'\n';
     //moves->setText(t);
     QVector<QPoint> p ;
-    qDebug() <<table << "for";
     for(int row=0; row!=movesTable->rowCount(); ++row){
         p=db->readMove(table,row);
-        qDebug() <<"moveList2";
         QTableWidgetItem *newItem = new QTableWidgetItem(db->intToChar(p[0].x())+QString::number(p[0].y()),QTableWidgetItem::Type);
         movesTable->setItem(row, 0, newItem);
         newItem = new QTableWidgetItem(db->intToChar(p[1].x())+QString::number(p[1].y()),QTableWidgetItem::Type);

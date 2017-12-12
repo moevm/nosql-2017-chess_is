@@ -7,6 +7,8 @@
 #include <QTableWidget>
 #include <Headers/controller.h>
 #include <QDate>
+#include <QMouseEvent>
+#include <QMessageBox>
 
 class BoardVision : public QObject
 {
@@ -45,8 +47,11 @@ public:
     ~BoardVision();
     void buttons();
     void initBoard();
+
     signals:
     void wantMove(QPoint from,QPoint to);
+
+
 private slots:
     void onListClicked(QListWidgetItem* item );
     void moveList();
@@ -57,6 +62,8 @@ private slots:
     void clearBoard();
     void savedMoves();
     void deletedMoves();
+    void findDeb();
+    void deletedCurrTable();
 };
 
 #endif // BOARDVISION_H

@@ -74,7 +74,7 @@ public:
     {
 
         collection = db[name.toStdString()];
-        qDebug() << name <<"cT";
+        //qDebug() << name <<"cT";
     }
     QStringList tableList(const QString &ct)
     {
@@ -149,14 +149,14 @@ public:
 
         QVector<QPoint> moves;
         mongocxx::cursor cursor = collection.find(document{} << finalize);
-        qDebug() <<"rM";
+       // qDebug() <<"rM";
         int k=0;
         for(auto doc : cursor) {
             s= QString::fromStdString(bsoncxx::to_json(doc));
 
             list=s.split(",");
 
-            qDebug() <<list[4].split(":")<<i;
+           // qDebug() <<list[4].split(":")<<i;
             if(i==k)
             {
                  moves<<QPoint(list[1].split(":").last().remove(" ").toInt(),list[2].split(":").last().remove(" ").toInt());
@@ -181,7 +181,7 @@ public:
     }
 
 
-    QString searchDebute(QVector<QPoint> &deb)
+    QString searchDebute(QVector<QPoint> &deb, const QString &name)
     {
         if(deb.count()<6) return "false";
         QVector<QPoint> moves;
@@ -190,15 +190,17 @@ public:
         for(i =0;i<list.count();i++ )
         {
             QString table = list[i];
-            for(int j=0;j<deb.count();j++  ){
-                moves<<readMove(table,i);
+            if(table==name) continue;
+            for(int j=0;j<deb.count()/2;j++  ){
+                moves<<readMove(table,j);
             }
             qSort(moves.begin(),moves.end(),lessThan);
             qSort(deb.begin(),deb.end(),lessThan);
-            //qDebug() << p << deb;
+            //qDebug() <<moves;
             if(moves==deb) break;
             moves.clear();
         }
+        qDebug() <<list[i];
         if(moves==deb)  return list[i];
         return "false";
     }
