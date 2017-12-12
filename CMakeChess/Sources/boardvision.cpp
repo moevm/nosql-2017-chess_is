@@ -130,7 +130,6 @@ void BoardVision::findDeb(){
         QVector<QPoint> moves;
     for(int i=0;i<n;i++)
         moves<<db->readMove(currTable,i);
-    qDebug() <<currTable<<moves;
     QString t=db->searchDebute(moves,currTable);
     if(t!="false"){
         qDebug() <<t;
@@ -222,7 +221,6 @@ void BoardVision::setupedMove(QList<Player*> pl,unsigned int play, bool k){
     font.setPointSize(14);
     kLabel->setFont(font);
     kLabel->show();
-    qDebug() << k;
     if(k)
        kLabel->setText("Шах!");
     else
@@ -238,13 +236,11 @@ void BoardVision::setupedMove(QList<Player*> pl,unsigned int play, bool k){
     color->tileColor=play;
     color->tileDisplay();
     for (int i=0; i<pl[0]->getPieces().length();i++){
-        //qDebug() <<pl[0]->getPieces()[i]->getPosition();
     tile[pl[0]->getPieces()[i]->getPosition().y()-1][pl[0]->getPieces()[i]->getPosition().x()-1]->pieceColor=true;
     tile[pl[0]->getPieces()[i]->getPosition().y()-1][pl[0]->getPieces()[i]->getPosition().x()-1]->piece=1;
     tile[pl[0]->getPieces()[i]->getPosition().y()-1][pl[0]->getPieces()[i]->getPosition().x()-1]->display(pl[0]->getPieces()[i]->getType());
     }
     for (int i=0; i<pl[1]->getPieces().length();i++){
-        //qDebug() <<pl[1]->getPieces()[i]->getPosition();
     tile[pl[1]->getPieces()[i]->getPosition().y()-1][pl[1]->getPieces()[i]->getPosition().x()-1]->pieceColor=false;
     tile[pl[1]->getPieces()[i]->getPosition().y()-1][pl[1]->getPieces()[i]->getPosition().x()-1]->piece=1;
     tile[pl[1]->getPieces()[i]->getPosition().y()-1][pl[1]->getPieces()[i]->getPosition().x()-1]->display(pl[1]->getPieces()[i]->getType());
@@ -285,9 +281,6 @@ void BoardVision::moveList()
     movesTable->setGeometry(660,35,250,550);
     movesTable->setStyleSheet("QLabel {background-color: white;}");
     movesTable->setHorizontalHeaderLabels(QStringList() << "Откуда" << "Куда");
-    //QString t="";
-    //t=table+'\n'+db->readMovesS(table)+'\n';
-    //moves->setText(t);
     QVector<QPoint> p ;
     for(int row=0; row!=movesTable->rowCount(); ++row){
         p=db->readMove(table,row);
@@ -296,11 +289,8 @@ void BoardVision::moveList()
         newItem = new QTableWidgetItem(db->intToChar(p[1].x())+QString::number(p[1].y()),QTableWidgetItem::Type);
         movesTable->setItem(row, 1, newItem);
     }
-   // moves->selectRow(0);
     movesTable->show();
-    //moves->selectRow(3);
 }
 void BoardVision::onListClicked(QListWidgetItem *item){
-    qDebug() <<item->text();
     table=item->text();
 }
