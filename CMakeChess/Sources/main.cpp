@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
         QWidget *myWidget = new QWidget();
         myWidget->setGeometry(50,50,1070,750);
         BoardVision *bv = new BoardVision(myWidget);
+
         bv->initBoard();
         bv->buttons();
         myWidget->show();

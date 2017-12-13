@@ -25,7 +25,7 @@ BoardVision::BoardVision(QWidget *widget)
     color->tileNum=0;
     color->tileDisplay();
     color->setGeometry(30,620,50,50);
-    QLabel *playerLabel = new QLabel("РРіСЂРѕРє:",baseWidget);
+    QLabel *playerLabel = new QLabel("Игрок:",baseWidget);
     playerLabel->setGeometry(30,590,60,20);
     for(i=7;i>=0;i--)
     {
@@ -51,6 +51,8 @@ BoardVision::BoardVision(QWidget *widget)
     c->initializeGame(false);
     connect(this,SIGNAL(wantMove(QPoint,QPoint)),c,SLOT(makeMove(QPoint,QPoint)) );
     connect(c,SIGNAL(moveMade(QList<Player*>,unsigned int,bool)),this,SLOT(setupedMove(QList<Player*>,unsigned int,bool)));
+    db->al23_barbo();
+    db->Murphy();
 }
 
 BoardVision::~BoardVision(){
@@ -58,7 +60,7 @@ BoardVision::~BoardVision(){
 }
 
 void BoardVision::buttons(){
-    QLabel *partLabel = new QLabel("РџР°СЂС‚РёРё:",baseWidget);
+    QLabel *partLabel = new QLabel("Партии:",baseWidget);
     partLabel->setGeometry(930,570,80,20);
     listWgt = new QListWidget(baseWidget);
     listWgt->setGeometry(920,590,110,70);
@@ -73,7 +75,7 @@ void BoardVision::buttons(){
     db->createTable(currTable);
     //qDebug() << db->tableList("1");
 
-    QPushButton *dButton= new QPushButton("Р—Р°РіСЂСѓР·РёС‚СЊ РїР°СЂС‚РёСЋ",baseWidget);
+    QPushButton *dButton= new QPushButton("Загрузить партию",baseWidget);
     dButton->setGeometry(700,590,150,20);
     connect( dButton, SIGNAL(clicked()),this,SLOT(moveList()));
 
@@ -86,24 +88,24 @@ void BoardVision::buttons(){
     //if(movesTable==nullptr) nextButton->setEnabled(false);
     //else nextButton->setEnabled(true);
 
-    QPushButton *clearButton= new QPushButton("РћС‡РёСЃС‚РёС‚СЊ",baseWidget);
+    QPushButton *clearButton= new QPushButton("Очистить",baseWidget);
     clearButton->setGeometry(455,600,90,20);
     connect( clearButton, SIGNAL(clicked()),this,SLOT(clearBoard()));
 
-   QPushButton *saButton= new QPushButton("РЎРѕС…СЂР°РЅРёС‚СЊ РїР°СЂС‚РёСЋ",baseWidget);
+   QPushButton *saButton= new QPushButton("Сохранить партию",baseWidget);
     saButton->setGeometry(700,620,150,20);
     connect( saButton, SIGNAL(clicked()),this,SLOT(savedMoves()));
-   QPushButton *seButton= new QPushButton("РЈРґР°Р»РёС‚СЊ РїР°СЂС‚РёСЋ",baseWidget);
+   QPushButton *seButton= new QPushButton("Удалить партию",baseWidget);
    seButton->setGeometry(700,650,150,20);
    connect( seButton, SIGNAL(clicked()),this,SLOT(deletedMoves()));
-   QPushButton *deButton= new QPushButton("РџРѕРёСЃРє РїРѕ РґРµР±СЋС‚Сѓ",baseWidget);
+   QPushButton *deButton= new QPushButton("Поиск по дебюту",baseWidget);
    deButton->setGeometry(700,680,150,20);
    connect( deButton, SIGNAL(clicked()),this,SLOT(findDeb()));
    //connect( this, SIGNAL(closeEvent(QCloseEvent*)),this,SLOT(deletedCurrTable()));
    QComboBox *fd =new QComboBox(baseWidget);
-   fd->setGeometry(930,680,80,20);
-   fd->addItem("РћС‚РєСЂС‹С‚С‹Рµ РґРµР±СЋС‚С‹");
-   fd->addItem("Р—Р°РєСЂС‹С‚С‹Рµ РґРµР±СЋС‚С‹");
+   fd->setGeometry(930,680,100,20);
+   fd->addItem("Открытые дебюты");
+   fd->addItem("Закрытые дебюты");
    connect( fd, QOverload<int>::of(&QComboBox::currentIndexChanged),
             [=](int i){
        if(i==0){
@@ -120,9 +122,6 @@ void BoardVision::buttons(){
    fd->show();
 }
 
-void BoardVision::filteredDeb(){
-
-}
 void BoardVision::savedMoves(){
     listWgt->addItem(currTable);
     saveInd++;
@@ -145,7 +144,7 @@ void BoardVision::deletedCurrTable(){
 
 void BoardVision::findDeb(){
     QMessageBox msgBox;
-    msgBox.setWindowTitle("РџРѕРёСЃРє Р·Р°РІРµСЂС€РµРЅ");
+    msgBox.setWindowTitle("Поиск завершен");
     int n=db->recordCount(currTable);
         QVector<QPoint> moves;
     for(int i=0;i<n;i++)
@@ -156,7 +155,7 @@ void BoardVision::findDeb(){
         table=t;
         moveList();
         msgBox.setText(t);
-    } else msgBox.setText("РќРµСѓРґР°С‡РЅРѕ");
+    } else msgBox.setText("Неудачно");
     msgBox.exec();
 }
 void BoardVision::initBoard(){
@@ -242,7 +241,7 @@ void BoardVision::setupedMove(QList<Player*> pl,unsigned int play, bool k){
     kLabel->setFont(font);
     kLabel->show();
     if(k)
-       kLabel->setText("РЁР°С…!");
+       kLabel->setText("Шах!");
     else
        kLabel->clear();
     for(int i=7;i>=0;i--)
@@ -300,7 +299,7 @@ void BoardVision::moveList()
     movesTable = new QTableWidget(db->recordCount(table),2,baseWidget);
     movesTable->setGeometry(660,35,250,550);
     movesTable->setStyleSheet("QLabel {background-color: white;}");
-    movesTable->setHorizontalHeaderLabels(QStringList() << "РћС‚РєСѓРґР°" << "РљСѓРґР°");
+    movesTable->setHorizontalHeaderLabels(QStringList() << "Откуда" << "Куда");
     QVector<QPoint> p ;
     for(int row=0; row!=movesTable->rowCount(); ++row){
         p=db->readMove(table,row);

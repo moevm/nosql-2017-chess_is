@@ -65,7 +65,6 @@ private slots:
     void deletedMoves();
     void findDeb();
     void deletedCurrTable();
-    void filteredDeb();
 };
 
 #endif // BOARDVISION_H

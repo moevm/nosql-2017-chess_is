@@ -233,8 +233,7 @@ public:
     }
 
     void al23_barbo(){
-            deleteTable("Al_barbo");
-            createTable("Al_barbo");
+        if(!containsTable("Al_barbo")){
             writeMove("Al_barbo",QPoint(5,2),QPoint(5,4));
             writeMove("Al_barbo",QPoint(5,7),QPoint(5,5));
             writeMove("Al_barbo",QPoint(7,1),QPoint(6,3));
@@ -274,15 +273,15 @@ public:
             writeMove("Al_barbo",QPoint(8,3),QPoint(7,4));
             writeMove("Al_barbo",QPoint(8,1),QPoint(7,2));
             writeMove("Al_barbo",QPoint(8,5),QPoint(8,3));
+        }
             //QVector <QPoint> v;
             //v<<QPoint(5,2)<<QPoint(5,4)<<QPoint(5,7)<<QPoint(5,5)<<QPoint(7,1)<<QPoint(6,3)<<
                    // QPoint(2,8)<< QPoint(3,6)<<QPoint(6,1)<<QPoint(3,4)<<QPoint(6,8)<<QPoint(3,5);
-            //qDebug()<<searchDebute(v);
+            qDebug()<<"searchDebute(v)";
     }
 
     void Murphy(){
-        //DB *db = new DB();
-            createTable("ChessMorphy");
+        if(!containsTable("ChessMorphy")) {
             writeMove("ChessMorphy",QPoint(5,2),QPoint(5,4));
             writeMove("ChessMorphy",QPoint(5,7),QPoint(5,5));
             writeMove("ChessMorphy",QPoint(7,1),QPoint(6,3));
@@ -320,6 +319,7 @@ public:
             writeMove("ChessMorphy",QPoint(4,1),QPoint(4,8));
            // QPoint m[12]={QPoint(5,2),QPoint(5,4),QPoint(5,7),QPoint(5,5),QPoint(7,1),QPoint(6,3),
                   //  QPoint(4,7), QPoint(4,6),QPoint(4,2),QPoint(4,4),QPoint(3,8),QPoint(7,4)};
+        }
     }
 };
 
