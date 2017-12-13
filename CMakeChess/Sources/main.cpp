@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         while(system ("nc -zvv localhost 27017"));
         QApplication a(argc, argv);
         QWidget *myWidget = new QWidget();
-        myWidget->setGeometry(50,50,1070,700);
+        myWidget->setGeometry(50,50,1070,750);
         BoardVision *bv = new BoardVision(myWidget);
         bv->initBoard();
         bv->buttons();

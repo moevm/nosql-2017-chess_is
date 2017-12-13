@@ -9,6 +9,7 @@
 #include <QDate>
 #include <QMouseEvent>
 #include <QMessageBox>
+#include <QComboBox>
 
 class BoardVision : public QObject
 {
@@ -64,6 +65,7 @@ private slots:
     void deletedMoves();
     void findDeb();
     void deletedCurrTable();
+    void filteredDeb();
 };
 
 #endif // BOARDVISION_H

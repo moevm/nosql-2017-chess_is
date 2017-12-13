@@ -185,12 +185,11 @@ public:
     {
         if(deb.count()<6) return "false";
         QVector<QPoint> moves;
-        QStringList list=tableList("1");
+        QStringList list=tableList(name);
         int k=0,i;
         for(i =0;i<list.count();i++ )
         {
             QString table = list[i];
-            if(table==name) continue;
             for(int j=0;j<deb.count()/2;j++  ){
                 moves<<readMove(table,j);
             }
@@ -203,6 +202,26 @@ public:
         qDebug() <<list[i];
         if(moves==deb)  return list[i];
         return "false";
+    }
+
+    QStringList filterDebute(QVector<QPoint> &deb, const QString &name)
+    {
+        QVector<QPoint> moves;
+        QStringList list=tableList(name),res;
+        int k=0,i;
+        for(i =0;i<list.count();i++ )
+        {
+            QString table = list[i];
+            for(int j=0;j<deb.count()/2;j++  ){
+                moves<<readMove(table,j);
+            }
+            qSort(moves.begin(),moves.end(),lessThan);
+            qSort(deb.begin(),deb.end(),lessThan);
+            //qDebug() <<moves;
+            if(moves==deb) res<<list[i];
+            moves.clear();
+        }
+        return res;
     }
 
     static bool lessThan( const QPoint & e1, const QPoint & e2 )
@@ -286,7 +305,7 @@ public:
             writeMove("ChessMorphy",QPoint(3,6),QPoint(2,5));
             writeMove("ChessMorphy",QPoint(3,4),QPoint(2,5));
             writeMove("ChessMorphy",QPoint(2,8),QPoint(4,7));
-            writeMove("ChessMorphy",QPoint(5,1),QPoint(3,1)); //рокировка
+            writeMove("ChessMorphy",QPoint(5,1),QPoint(3,1)); //СЂРѕРєРёСЂРѕРІРєР°
             writeMove("ChessMorphy",QPoint(1,1),QPoint(4,1));
             writeMove("ChessMorphy",QPoint(1,8),QPoint(4,8));
             writeMove("ChessMorphy",QPoint(4,1),QPoint(4,7));
